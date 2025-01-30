@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import electron from 'electron';
-const { BrowserWindow, app, ipcMain } = electron;
+const { BrowserWindow, app, ipcMain, globalShortcut } = electron;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -26,7 +26,18 @@ function createWindow() {
 	// Always open DevTools for debugging
 	mainWindow?.webContents.openDevTools();
 
+	// Register keyboard shortcuts
+	globalShortcut.register('CommandOrControl+W', () => {
+		mainWindow?.webContents.send('close-active-tab');
+	});
+
+	globalShortcut.register('CommandOrControl+S', () => {
+		mainWindow?.webContents.send('toggle-sidebar');
+	});
+
 	mainWindow?.on('closed', () => {
+		// Unregister shortcuts when window is closed
+		globalShortcut.unregisterAll();
 		mainWindow = null;
 	});
 }

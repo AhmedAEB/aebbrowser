@@ -21,21 +21,36 @@ class Browser {
 	private tabsContainer: HTMLElement;
 	private webviewContainer: HTMLElement;
 	private urlInput: HTMLInputElement;
+	private sidebarVisible: boolean = true;
+	private sidebar: HTMLElement;
 
 	constructor() {
 		console.log('Browser class initializing...'); // Debug
 		this.tabsContainer = document.getElementById('tabs-container') as HTMLElement;
 		this.webviewContainer = document.getElementById('webview-container') as HTMLElement;
 		this.urlInput = document.getElementById('url-input') as HTMLInputElement;
+		this.sidebar = document.getElementById('sidebar') as HTMLElement;
 
 		console.log('DOM elements found:', { // Debug
 			tabsContainer: !!this.tabsContainer,
 			webviewContainer: !!this.webviewContainer,
-			urlInput: !!this.urlInput
+			urlInput: !!this.urlInput,
+			sidebar: !!this.sidebar
 		});
 
 		this.setupEventListeners();
 		this.createNewTab('https://www.google.com');
+
+		// Add keyboard shortcut handlers
+		ipcRenderer.on('close-active-tab', () => {
+			if (this.activeTabId) {
+				this.closeTab(this.activeTabId);
+			}
+		});
+
+		ipcRenderer.on('toggle-sidebar', () => {
+			this.toggleSidebar();
+		});
 	}
 
 	private setupEventListeners() {
@@ -237,6 +252,15 @@ class Browser {
 		return url;
 	}
 
+	private toggleSidebar() {
+		this.sidebarVisible = !this.sidebarVisible;
+		if (this.sidebarVisible) {
+			this.sidebar.style.display = 'flex';
+		} else {
+			this.sidebar.style.display = 'none';
+		}
+	}
+
 	private closeTab(tabId: string) {
 		const tab = this.tabs.get(tabId);
 		if (!tab) return;
@@ -245,17 +269,16 @@ class Browser {
 		tab.element.remove();
 		tab.webview.remove();
 
-		// Remove from tabs map
+		// Remove from tabs collection
 		this.tabs.delete(tabId);
 
 		// If this was the active tab, activate another tab
 		if (this.activeTabId === tabId) {
 			this.activeTabId = null;
-			
 			// Find the last tab to activate
-			const remainingTabs = Array.from(this.tabs.keys());
-			if (remainingTabs.length > 0) {
-				this.activateTab(remainingTabs[remainingTabs.length - 1]);
+			const lastTab = Array.from(this.tabs.keys()).pop();
+			if (lastTab) {
+				this.activateTab(lastTab);
 			}
 		}
 
