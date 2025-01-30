@@ -37,6 +37,11 @@ function createWindow() {
 		mainWindow?.webContents.send('new-tab');
 	});
 
+	// Add URL copy shortcut
+	globalShortcut.register('CommandOrControl+Shift+C', () => {
+		mainWindow?.webContents.send('copy-current-url');
+	});
+
 	mainWindow?.on('closed', () => {
 		// Unregister shortcuts when window is closed
 		globalShortcut.unregisterAll();

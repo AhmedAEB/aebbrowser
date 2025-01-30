@@ -24,6 +24,9 @@ class Browser {
 	private urlInput: HTMLInputElement;
 	private sidebarVisible = true;
 	private sidebar: HTMLElement;
+	private toast: HTMLElement;
+	private toastMessage: HTMLElement;
+	private toastTimeout: NodeJS.Timeout | null = null;
 
 	constructor() {
 		console.log('Browser class initializing...'); // Debug
@@ -31,12 +34,16 @@ class Browser {
 		this.webviewContainer = document.getElementById('webview-container') as HTMLElement;
 		this.urlInput = document.getElementById('url-input') as HTMLInputElement;
 		this.sidebar = document.getElementById('sidebar') as HTMLElement;
+		this.toast = document.getElementById('toast') as HTMLElement;
+		this.toastMessage = document.getElementById('toast-message') as HTMLElement;
 
 		console.log('DOM elements found:', { // Debug
 			tabsContainer: !!this.tabsContainer,
 			webviewContainer: !!this.webviewContainer,
 			urlInput: !!this.urlInput,
-			sidebar: !!this.sidebar
+			sidebar: !!this.sidebar,
+			toast: !!this.toast,
+			toastMessage: !!this.toastMessage
 		});
 
 		this.setupEventListeners();
@@ -55,6 +62,11 @@ class Browser {
 
 		ipcRenderer.on('new-tab', () => {
 			this.createNewTab('https://www.google.com');
+		});
+
+		// Add copy URL handler
+		ipcRenderer.on('copy-current-url', () => {
+			this.copyCurrentUrl();
 		});
 	}
 
@@ -310,6 +322,44 @@ class Browser {
 		if (this.tabs.size === 0) {
 			this.createNewTab('https://www.google.com');
 		}
+	}
+
+	private copyCurrentUrl() {
+		if (this.activeTabId) {
+			const tab = this.tabs.get(this.activeTabId);
+			if (tab) {
+				// Focus the window first
+				window.focus();
+
+				// Small delay to ensure focus is complete
+				setTimeout(() => {
+					navigator.clipboard.writeText(tab.url)
+						.then(() => {
+							this.showToast('URL copied to clipboard');
+						})
+						.catch(err => {
+							console.error('Failed to copy URL:', err);
+							this.showToast('Failed to copy URL');
+						});
+				}, 100);
+			}
+		}
+	}
+
+	private showToast(message: string) {
+		// Clear any existing timeout
+		if (this.toastTimeout) {
+			clearTimeout(this.toastTimeout);
+		}
+
+		// Update message and show toast
+		this.toastMessage.textContent = message;
+		this.toast.classList.add('show');
+
+		// Hide toast after 3 seconds
+		this.toastTimeout = setTimeout(() => {
+			this.toast.classList.remove('show');
+		}, 3000);
 	}
 }
 
