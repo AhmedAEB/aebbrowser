@@ -23,9 +23,6 @@ function createWindow() {
 
 	mainWindow?.loadFile(path.join(__dirname, '../src/index.html'));
 
-	// Always open DevTools for debugging
-	mainWindow?.webContents.openDevTools();
-
 	// Register keyboard shortcuts
 	globalShortcut.register('CommandOrControl+W', () => {
 		mainWindow?.webContents.send('close-active-tab');
@@ -33,6 +30,11 @@ function createWindow() {
 
 	globalShortcut.register('CommandOrControl+S', () => {
 		mainWindow?.webContents.send('toggle-sidebar');
+	});
+
+	// Add new shortcut for new tab
+	globalShortcut.register('CommandOrControl+T', () => {
+		mainWindow?.webContents.send('new-tab');
 	});
 
 	mainWindow?.on('closed', () => {

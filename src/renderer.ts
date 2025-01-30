@@ -7,6 +7,7 @@ interface Tab {
 	title: string;
 	webview: Electron.WebviewTag;
 	element: HTMLDivElement;
+	favicon: string;
 }
 
 // Add IPC event types
@@ -50,6 +51,10 @@ class Browser {
 
 		ipcRenderer.on('toggle-sidebar', () => {
 			this.toggleSidebar();
+		});
+
+		ipcRenderer.on('new-tab', () => {
+			this.createNewTab('https://www.google.com');
 		});
 	}
 
@@ -98,6 +103,12 @@ class Browser {
 		// Create tab element
 		const tabElement = document.createElement('div');
 		tabElement.className = 'tab';
+
+		// Create favicon image
+		const faviconImg = document.createElement('img');
+		faviconImg.className = 'tab-favicon';
+		faviconImg.src = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='; // Transparent placeholder
+		tabElement.appendChild(faviconImg);
 
 		// Create title span
 		const titleSpan = document.createElement('span');
@@ -184,13 +195,26 @@ class Browser {
 			}
 		});
 
+		// Add page-favicon-updated event listener
+		webview.addEventListener('page-favicon-updated', (e) => {
+			const tab = this.tabs.get(tabId);
+			if (tab && e.favicons && e.favicons.length > 0) {
+				tab.favicon = e.favicons[0];
+				const faviconImg = tab.element.querySelector('.tab-favicon') as HTMLImageElement;
+				if (faviconImg) {
+					faviconImg.src = e.favicons[0];
+				}
+			}
+		});
+
 		// Store tab data
 		const tab: Tab = {
 			id: tabId,
 			url,
 			title: 'Loading...',
 			webview,
-			element: tabElement
+			element: tabElement,
+			favicon: ''
 		};
 		this.tabs.set(tabId, tab);
 
