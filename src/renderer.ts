@@ -139,11 +139,21 @@ class Browser {
 
 		tabElement.addEventListener('click', () => this.activateTab(tabId));
 
-		// Create webview with error handling
+		// Create webview with extension support
 		const webview = document.createElement('webview') as Electron.WebviewTag;
 		webview.setAttribute('autosize', 'on');
 		webview.setAttribute('nodeintegration', 'on');
 		webview.setAttribute('webpreferences', 'contextIsolation=false');
+
+		// Add these attributes for extension support
+		webview.setAttribute('plugins', 'on');
+		webview.setAttribute('enableremotemodule', 'on');
+
+		// Enable Chrome extension APIs
+		webview.setAttribute('preload', `
+			window.chrome = chrome;
+			window.browser = chrome;
+		`);
 
 		// Add error handling for webview
 		webview.addEventListener('dom-ready', () => {

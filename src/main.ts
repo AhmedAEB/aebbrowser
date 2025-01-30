@@ -1,12 +1,28 @@
 import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import electron from 'electron';
+import electron, { session } from 'electron';
 const { BrowserWindow, app, ipcMain, globalShortcut } = electron;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let mainWindow: electron.BrowserWindow | null = null;
+
+async function loadExtensions() {
+	try {
+		// Path to your extensions directory (you can change this)
+		const extensionsPath = path.join(app.getPath('userData'), 'extensions');
+
+		// Enable loading extensions
+		await session.defaultSession.loadExtension(extensionsPath, {
+			allowFileAccess: true
+		});
+
+		console.log('Extensions loaded successfully');
+	} catch (err) {
+		console.error('Failed to load extensions:', err);
+	}
+}
 
 function createWindow() {
 	mainWindow = new BrowserWindow({
@@ -18,6 +34,8 @@ function createWindow() {
 			webviewTag: true,
 			webSecurity: true,
 			sandbox: false,
+			plugins: true,
+			experimentalFeatures: true,
 		}
 	});
 
@@ -49,7 +67,10 @@ function createWindow() {
 	});
 }
 
-app.whenReady().then(createWindow);
+app.whenReady().then(async () => {
+	await loadExtensions();
+	createWindow();
+});
 
 app.on('window-all-closed', () => {
 	if (process.platform !== 'darwin') {
@@ -78,5 +99,19 @@ ipcMain.on('navigate', (event, { tabId, url }: { tabId: string, url: string }) =
 			url = `https://${url}`;
 		}
 		event.reply('update-tab', { tabId, url });
+	}
+});
+
+// Add these IPC handlers for extension management
+ipcMain.handle('get-extensions-path', () => {
+	return path.join(app.getPath('userData'), 'extensions');
+});
+
+ipcMain.handle('load-extension', async (_event, extensionPath: string) => {
+	try {
+		const extension = await session.defaultSession.loadExtension(extensionPath);
+		return { success: true, extension };
+	} catch (error) {
+		return { success: false, error: (error as Error).message };
 	}
 }); 
