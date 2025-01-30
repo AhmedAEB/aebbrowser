@@ -21,7 +21,7 @@ class Browser {
 	private tabsContainer: HTMLElement;
 	private webviewContainer: HTMLElement;
 	private urlInput: HTMLInputElement;
-	private sidebarVisible: boolean = true;
+	private sidebarVisible = true;
 	private sidebar: HTMLElement;
 
 	constructor() {
@@ -98,12 +98,12 @@ class Browser {
 		// Create tab element
 		const tabElement = document.createElement('div');
 		tabElement.className = 'tab';
-		
+
 		// Create title span
 		const titleSpan = document.createElement('span');
 		titleSpan.textContent = 'Loading...';
 		tabElement.appendChild(titleSpan);
-		
+
 		// Create close button
 		const closeButton = document.createElement('div');
 		closeButton.className = 'tab-close';
@@ -113,7 +113,7 @@ class Browser {
 			this.closeTab(tabId);
 		});
 		tabElement.appendChild(closeButton);
-		
+
 		tabElement.addEventListener('click', () => this.activateTab(tabId));
 
 		// Create webview with error handling
@@ -121,7 +121,7 @@ class Browser {
 		webview.setAttribute('autosize', 'on');
 		webview.setAttribute('nodeintegration', 'on');
 		webview.setAttribute('webpreferences', 'contextIsolation=false');
-		
+
 		// Add error handling for webview
 		webview.addEventListener('dom-ready', () => {
 			console.log(`Webview DOM ready for tab ${tabId}`);
