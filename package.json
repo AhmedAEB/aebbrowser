@@ -1,0 +1,29 @@
+{
+	"name": "aebbrowser",
+	"version": "1.0.0",
+	"type": "module",
+	"main": "dist/main.js",
+	"license": "MIT",
+	"scripts": {
+		"start": "tsc && electron .",
+		"dev": "tsc && electron .",
+		"watch": "tsc -w",
+		"build": "tsc"
+	},
+	"devDependencies": {
+		"@types/electron": "^1.6.10",
+		"@types/node": "^20.11.19",
+		"@types/react": "^18.2.55",
+		"@types/react-dom": "^18.2.19",
+		"@typescript-eslint/eslint-plugin": "^7.0.1",
+		"@typescript-eslint/parser": "^7.0.1",
+		"electron": "^28.2.3",
+		"eslint": "^8.56.0",
+		"typescript": "^5.3.3"
+	},
+	"dependencies": {
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"electron-tabs": "^1.0.1"
+	}
+}
