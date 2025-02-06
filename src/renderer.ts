@@ -27,7 +27,6 @@ class Browser {
 	private toast: HTMLElement;
 	private toastMessage: HTMLElement;
 	private toastTimeout: NodeJS.Timeout | null = null;
-	private isUrlTruncated = true;
 
 	constructor() {
 		console.log('Browser class initializing...'); // Debug
@@ -68,16 +67,6 @@ class Browser {
 		// Add copy URL handler
 		ipcRenderer.on('copy-current-url', () => {
 			this.copyCurrentUrl();
-		});
-
-		// Add URL truncation toggle
-		this.urlInput.addEventListener('click', () => {
-			this.toggleUrlTruncation();
-		});
-
-		this.urlInput.addEventListener('blur', () => {
-			this.isUrlTruncated = true;
-			this.updateUrlDisplay();
 		});
 	}
 
@@ -398,32 +387,11 @@ class Browser {
 		}, 3000);
 	}
 
-	private toggleUrlTruncation() {
-		this.isUrlTruncated = !this.isUrlTruncated;
-		this.updateUrlDisplay();
-	}
-
 	private updateUrlDisplay() {
 		if (!this.activeTabId) return;
 
 		const tab = this.tabs.get(this.activeTabId);
 		if (!tab) return;
-
-		if (this.isUrlTruncated) {
-			this.urlInput.classList.add('truncated');
-			// Show only the domain and first path segment
-			try {
-				const url = new URL(tab.url);
-				const pathSegments = url.pathname.split('/').filter(s => s);
-				const displayPath = pathSegments.length > 0 ? `/${pathSegments[0]}...` : '';
-				this.urlInput.value = url.origin + displayPath;
-			} catch {
-				this.urlInput.value = tab.url;
-			}
-		} else {
-			this.urlInput.classList.remove('truncated');
-			this.urlInput.value = tab.url;
-		}
 	}
 }
 
