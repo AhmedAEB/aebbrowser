@@ -70,6 +70,38 @@
             margin-top: 5px;
             border: 1px solid #E2D9F3;
             box-shadow: 0 1px 2px rgba(167, 139, 250, 0.05);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        #url-container:hover {
+            border-color: #C6B5FF;
+            box-shadow: 0 2px 4px rgba(167, 139, 250, 0.1);
+        }
+        .nav-buttons {
+            display: flex;
+            gap: 4px;
+            padding: 0 8px;
+            border-right: 1px solid #E2D9F3;
+        }
+        .nav-button {
+            width: 24px;
+            height: 24px;
+            border: none;
+            background: transparent;
+            color: #9F8FD9;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .nav-button:hover {
+            background: #F6F3FF;
+            color: #4A3B89;
+        }
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         #url-input {
             width: 100%;
@@ -206,9 +238,9 @@
             top: 0;
             left: 0;
             width: 0;
-            height: 4px;
+            height: 3px;
             background: linear-gradient(to right, #A78BFA, #7C3AED);
-            transition: width 0.2s ease-out;
+            transition: width 0.2s ease-out, opacity 0.3s ease-out;
             z-index: 9999;
             opacity: 0;
             box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);
@@ -307,6 +339,30 @@
         #sidebar[style*="display: none"] ~ * #new-tab-btn {
             display: none;
         }
+
+        .tab-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            border: 2px solid #E2D9F3;
+            border-top-color: #7C3AED;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+        .loading-spinner.active {
+            display: block;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body>
@@ -322,6 +378,12 @@
                 <div id="topbar">
                     <button id="sidebar-toggle">‹</button>
                     <div id="url-container">
+                        <div class="nav-buttons">
+                            <button class="nav-button" id="back-button">‹</button>
+                            <button class="nav-button" id="forward-button">›</button>
+                            <button class="nav-button" id="refresh-button">↻</button>
+                        </div>
+                        <div class="loading-spinner"></div>
                         <input type="text" id="url-input" placeholder="Enter URL or search">
                     </div>
                 </div>

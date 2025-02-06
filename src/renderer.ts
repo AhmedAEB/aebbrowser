@@ -86,6 +86,21 @@ class Browser {
 			newTabBtn.addEventListener('click', () => this.createNewTab('https://www.google.com'));
 		}
 
+		// Navigation buttons
+		const backButton = document.getElementById('back-button');
+		const forwardButton = document.getElementById('forward-button');
+		const refreshButton = document.getElementById('refresh-button');
+
+		if (backButton) {
+			backButton.addEventListener('click', () => this.goBack());
+		}
+		if (forwardButton) {
+			forwardButton.addEventListener('click', () => this.goForward());
+		}
+		if (refreshButton) {
+			refreshButton.addEventListener('click', () => this.refreshCurrentTab());
+		}
+
 		// Sidebar toggle button
 		const sidebarToggleBtn = document.getElementById('sidebar-toggle');
 		if (sidebarToggleBtn) {
@@ -207,11 +222,13 @@ class Browser {
 		webview.addEventListener('did-start-loading', () => {
 			console.log('Webview started loading'); // Debug
 			this.startLoading();
+			this.updateNavigationButtons();
 		});
 
 		webview.addEventListener('did-finish-load', () => {
 			console.log('Webview finished loading'); // Debug
 			this.finishLoading();
+			this.updateNavigationButtons();
 		});
 
 		webview.addEventListener('page-title-updated', (e) => {
@@ -277,6 +294,7 @@ class Browser {
 			newTab.webview.classList.add('active');
 			this.urlInput.value = newTab.url;
 			this.updateUrlDisplay();
+			this.updateNavigationButtons();
 		}
 	}
 
@@ -441,6 +459,37 @@ class Browser {
 			if (tab) {
 				this.startLoading();
 				tab.webview.reload();
+			}
+		}
+	}
+
+	private goBack() {
+		if (this.activeTabId) {
+			const tab = this.tabs.get(this.activeTabId);
+			if (tab?.webview?.canGoBack()) {
+				tab.webview.goBack();
+			}
+		}
+	}
+
+	private goForward() {
+		if (this.activeTabId) {
+			const tab = this.tabs.get(this.activeTabId);
+			if (tab?.webview?.canGoForward()) {
+				tab.webview.goForward();
+			}
+		}
+	}
+
+	private updateNavigationButtons() {
+		if (this.activeTabId) {
+			const tab = this.tabs.get(this.activeTabId);
+			if (tab) {
+				const backButton = document.getElementById('back-button') as HTMLButtonElement;
+				const forwardButton = document.getElementById('forward-button') as HTMLButtonElement;
+
+				backButton?.setAttribute('disabled', (!tab.webview?.canGoBack()).toString());
+				forwardButton?.setAttribute('disabled', (!tab.webview?.canGoForward()).toString());
 			}
 		}
 	}
