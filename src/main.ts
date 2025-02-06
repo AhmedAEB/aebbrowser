@@ -1,4 +1,4 @@
-import * as path from 'node:path';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import electron, { session } from 'electron';
 const { BrowserWindow, app, ipcMain, globalShortcut } = electron;
@@ -29,7 +29,8 @@ function createWindow() {
 		width: 1600,
 		height: 1000,
 		frame: false,
-		titleBarStyle: 'hiddenInset',
+		titleBarStyle: 'hidden',
+		trafficLightPosition: { x: 20, y: 20 },
 		webPreferences: {
 			nodeIntegration: true,
 			contextIsolation: false,
@@ -72,6 +73,17 @@ function createWindow() {
 	});
 
 	mainWindow?.loadFile(path.join(__dirname, '../src/index.html'));
+
+	// Add traffic light visibility handler
+	ipcMain.on('set-traffic-lights-visibility', (_event, visible: boolean) => {
+		if (mainWindow && process.platform === 'darwin') {
+			if (!visible) {
+				mainWindow.setWindowButtonVisibility(false);
+			} else {
+				mainWindow.setWindowButtonVisibility(true);
+			}
+		}
+	});
 
 	// Register keyboard shortcuts
 	globalShortcut.register('CommandOrControl+W', () => {

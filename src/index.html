@@ -21,6 +21,28 @@
             flex-direction: column;
             border: 1px solid #E2D9F3;
         }
+        #main-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            background: #ffffff;
+            height: 100%;
+            position: relative;
+        }
+        #right-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            left: 250px;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            transition: left 0.2s;
+        }
+        #sidebar[style*="display: none"] + #right-content {
+            left: 0;
+        }
         #topbar {
             height: 38px;
             background: #F6F3FF;
@@ -68,27 +90,21 @@
             white-space: nowrap;
             overflow: hidden;
         }
-        #main-container {
-            display: flex;
+        #webview-container {
             flex: 1;
-            overflow: hidden;
-            background: #ffffff;
-            height: calc(100% - 38px);
-        }
-        #sidebar {
-            width: 250px;
-            background: #F6F3FF;
-            border-right: 1px solid #E2D9F3;
             display: flex;
-            flex-direction: column;
-            height: 100%;
             position: relative;
+            min-height: 0;
+            background: #ffffff;
         }
-        #tabs-container {
+        webview {
             flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            padding-bottom: 60px;
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+        webview.active {
+            display: flex !important;
         }
         .tab {
             padding: 8px 10px;
@@ -113,7 +129,7 @@
         }
         #new-tab-btn {
             position: absolute;
-            bottom: 16px;
+            bottom: 20px;
             right: 16px;
             width: 32px;
             height: 32px;
@@ -130,26 +146,11 @@
             padding: 0;
             line-height: 1;
             box-shadow: 0 2px 4px rgba(167, 139, 250, 0.2);
+            z-index: 10;
         }
         #new-tab-btn:hover {
             background: #8875CC;
             transform: scale(1.05);
-        }
-        #webview-container {
-            flex: 1;
-            display: flex;
-            position: relative;
-            min-height: 0;
-            background: #ffffff;
-        }
-        webview {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            display: none;
-        }
-        webview.active {
-            display: flex !important;
         }
         .tab-close {
             width: 18px;
@@ -221,22 +222,62 @@
             opacity: 0;
             transition: width 0.3s ease-out, opacity 0.3s ease-out 0.2s;
         }
+
+        /* Style for the traffic light area */
+        .traffic-light-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 40px;
+            width: 100%;
+            -webkit-app-region: drag;
+        }
+
+        /* Hide traffic lights when sidebar is hidden */
+        #sidebar[style*="display: none"] .traffic-light-area {
+            display: none;
+        }
+
+        #sidebar {
+            width: 250px;
+            background: #F6F3FF;
+            border-right: 1px solid #E2D9F3;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            position: relative;
+            padding-top: 40px;
+            padding-bottom: 16px;
+            -webkit-app-region: drag;
+            overflow: hidden;
+        }
+
+        #tabs-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+            padding-bottom: 70px;
+            -webkit-app-region: no-drag;
+        }
     </style>
 </head>
 <body>
     <div id="app">
         <div id="loading-bar"></div>
-        <div id="topbar">
-            <div id="url-container">
-                <input type="text" id="url-input" placeholder="Enter URL or search">
-            </div>
-        </div>
         <div id="main-container">
             <div id="sidebar">
+                <div class="traffic-light-area"></div>
                 <button id="new-tab-btn">+</button>
                 <div id="tabs-container"></div>
             </div>
-            <div id="webview-container"></div>
+            <div id="right-content">
+                <div id="topbar">
+                    <div id="url-container">
+                        <input type="text" id="url-input" placeholder="Enter URL or search">
+                    </div>
+                </div>
+                <div id="webview-container"></div>
+            </div>
         </div>
         <div id="toast">
             <span id="toast-message"></span>

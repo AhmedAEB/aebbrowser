@@ -350,8 +350,10 @@ class Browser {
 		this.sidebarVisible = !this.sidebarVisible;
 		if (this.sidebarVisible) {
 			this.sidebar.style.display = 'flex';
+			ipcRenderer.send('set-traffic-lights-visibility', true);
 		} else {
 			this.sidebar.style.display = 'none';
+			ipcRenderer.send('set-traffic-lights-visibility', false);
 		}
 	}
 
