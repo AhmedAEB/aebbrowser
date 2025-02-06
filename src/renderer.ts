@@ -27,6 +27,8 @@ class Browser {
 	private toast: HTMLElement;
 	private toastMessage: HTMLElement;
 	private toastTimeout: NodeJS.Timeout | null = null;
+	private loadingBar: HTMLElement;
+	private loadingTimeout: NodeJS.Timeout | null = null;
 
 	constructor() {
 		console.log('Browser class initializing...'); // Debug
@@ -36,6 +38,7 @@ class Browser {
 		this.sidebar = document.getElementById('sidebar') as HTMLElement;
 		this.toast = document.getElementById('toast') as HTMLElement;
 		this.toastMessage = document.getElementById('toast-message') as HTMLElement;
+		this.loadingBar = document.getElementById('loading-bar') as HTMLElement;
 
 		console.log('DOM elements found:', { // Debug
 			tabsContainer: !!this.tabsContainer,
@@ -43,7 +46,8 @@ class Browser {
 			urlInput: !!this.urlInput,
 			sidebar: !!this.sidebar,
 			toast: !!this.toast,
-			toastMessage: !!this.toastMessage
+			toastMessage: !!this.toastMessage,
+			loadingBar: !!this.loadingBar
 		});
 
 		this.setupEventListeners();
@@ -205,10 +209,12 @@ class Browser {
 		// Setup webview events
 		webview.addEventListener('did-start-loading', () => {
 			console.log('Webview started loading'); // Debug
+			this.startLoading();
 		});
 
 		webview.addEventListener('did-finish-load', () => {
 			console.log('Webview finished loading'); // Debug
+			this.finishLoading();
 		});
 
 		webview.addEventListener('page-title-updated', (e) => {
@@ -277,16 +283,47 @@ class Browser {
 		}
 	}
 
+	private startLoading() {
+		// Clear any existing timeouts
+		if (this.loadingTimeout) {
+			clearTimeout(this.loadingTimeout);
+			this.loadingTimeout = null;
+		}
+
+		// Reset the loading bar
+		this.loadingBar.classList.remove('finished');
+		this.loadingBar.style.width = '0';
+		this.loadingBar.offsetHeight; // Force reflow
+
+		// Start loading animation
+		this.loadingBar.classList.add('loading');
+	}
+
+	private finishLoading() {
+		// Complete the loading animation
+		this.loadingBar.classList.remove('loading');
+		this.loadingBar.classList.add('finished');
+
+		// Clean up after animation
+		this.loadingTimeout = setTimeout(() => {
+			this.loadingBar.classList.remove('finished');
+			this.loadingBar.style.width = '0';
+			this.loadingTimeout = null;
+		}, 1000);
+	}
+
 	private navigateTab(tabId: string, url: string) {
 		const tab = this.tabs.get(tabId);
 		if (tab) {
 			const loadUrl = () => {
 				try {
+					this.startLoading();
 					tab.webview.loadURL(url);
 					tab.url = this.formatUrl(url);
 					console.log('URL loaded successfully:', url); // Debug
 				} catch (error) {
 					console.error('Error loading URL:', error); // Debug
+					this.finishLoading();
 				}
 			};
 
