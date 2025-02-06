@@ -154,11 +154,28 @@ class Browser {
 		const webview = document.createElement('webview') as Electron.WebviewTag;
 		webview.setAttribute('autosize', 'on');
 		webview.setAttribute('nodeintegration', 'on');
-		webview.setAttribute('webpreferences', 'contextIsolation=false');
+		webview.setAttribute('webpreferences', 'contextIsolation=false, plugins=true, webSecurity=true, autoplayPolicy=no-user-gesture-required');
+		webview.setAttribute('partition', 'persist:webview');
+		webview.setAttribute('allowpopups', 'on');
 
-		// Add these attributes for extension support
-		webview.setAttribute('plugins', 'on');
-		webview.setAttribute('enableremotemodule', 'on');
+		// Add error handling for webview
+		webview.addEventListener('did-fail-load', (e) => {
+			console.error('Failed to load:', e);
+			if (e.errorCode === -3) { // ERR_ABORTED
+				console.log('Retrying load after abort...');
+				setTimeout(() => {
+					webview.reload();
+				}, 100);
+			}
+		});
+
+		webview.addEventListener('crashed', (e) => {
+			console.error('Webview crashed:', e);
+			this.showToast('Page crashed. Reloading...');
+			setTimeout(() => {
+				webview.reload();
+			}, 1000);
+		});
 
 		// Enable Chrome extension APIs
 		webview.setAttribute('preload', `
@@ -173,11 +190,6 @@ class Browser {
 
 		webview.addEventListener('console-message', (e) => {
 			console.log('Webview console:', e.message);
-		});
-
-		webview.addEventListener('did-fail-load', (e) => {
-			console.error('Failed to load:', e.errorDescription);
-			titleSpan.textContent = 'Failed to load';
 		});
 
 		// Set source URL after adding event listeners

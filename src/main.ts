@@ -41,6 +41,36 @@ function createWindow() {
 		}
 	});
 
+	// Configure session for webview
+	const webviewSession = session.fromPartition('persist:webview');
+
+	// Configure content security policy
+	webviewSession.webRequest.onHeadersReceived((details, callback) => {
+		callback({
+			responseHeaders: {
+				...details.responseHeaders,
+				'Content-Security-Policy': ["default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob: *"]
+			}
+		});
+	});
+
+	// Configure session permissions for media
+	webviewSession.setPermissionRequestHandler((_webContents, permission, callback) => {
+		if (permission === 'media' || permission === 'fullscreen') {
+			callback(true);
+			return;
+		}
+		callback(true);
+	});
+
+	// Configure session to handle media autoplay
+	webviewSession.setPermissionCheckHandler((_webContents, permission) => {
+		if (permission === 'media' || permission === 'fullscreen') {
+			return true;
+		}
+		return true;
+	});
+
 	mainWindow?.loadFile(path.join(__dirname, '../src/index.html'));
 
 	// Register keyboard shortcuts
