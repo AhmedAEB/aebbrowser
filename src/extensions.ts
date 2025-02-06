@@ -1,6 +1,5 @@
+import * as fs from 'node:fs';
 import { ipcRenderer } from 'electron';
-import * as fs from 'fs';
-import * as path from 'path';
 
 export class ExtensionManager {
     private extensionsPath: string | null = null;
@@ -12,7 +11,7 @@ export class ExtensionManager {
 
     private async ensureExtensionDirectory() {
         if (!this.extensionsPath) return;
-        
+
         if (!fs.existsSync(this.extensionsPath)) {
             fs.mkdirSync(this.extensionsPath, { recursive: true });
         }
@@ -24,10 +23,10 @@ export class ExtensionManager {
             if (result.success) {
                 console.log('Extension loaded successfully:', result.extension);
                 return true;
-            } else {
-                console.error('Failed to load extension:', result.error);
-                return false;
             }
+
+            console.error('Failed to load extension:', result.error);
+            return false;
         } catch (error) {
             console.error('Error loading extension:', error);
             return false;
