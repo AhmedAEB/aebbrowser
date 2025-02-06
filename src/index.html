@@ -151,18 +151,6 @@
         webview.active {
             display: flex !important;
         }
-        .loading-indicator {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(255, 255, 255, 0.9);
-            padding: 10px 20px;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(167, 139, 250, 0.1);
-            border: 1px solid #E2D9F3;
-            color: #4A3B89;
-        }
         .tab-close {
             width: 18px;
             height: 18px;
@@ -214,24 +202,24 @@
             top: 0;
             left: 0;
             width: 0;
-            height: 3px;
-            background: linear-gradient(to right, #9F8FD9, #6B5BB5);
+            height: 4px;
+            background: linear-gradient(to right, #A78BFA, #7C3AED);
             transition: width 0.2s ease-out;
-            z-index: 1001;
+            z-index: 9999;
             opacity: 0;
-            box-shadow: 0 1px 2px rgba(167, 139, 250, 0.2);
+            box-shadow: 0 2px 4px rgba(124, 58, 237, 0.3);
         }
         
         #loading-bar.loading {
             opacity: 1;
-            width: 80%;
-            transition: width 15s cubic-bezier(0.1, 0.05, 0.1, 1);
+            width: 85%;
+            transition: width 8s cubic-bezier(0.1, 0.05, 0.1, 1);
         }
         
         #loading-bar.finished {
             width: 100%;
             opacity: 0;
-            transition: width 0.5s ease-out, opacity 0.5s ease-out 0.2s;
+            transition: width 0.3s ease-out, opacity 0.3s ease-out 0.2s;
         }
     </style>
 </head>

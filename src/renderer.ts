@@ -72,6 +72,11 @@ class Browser {
 		ipcRenderer.on('copy-current-url', () => {
 			this.copyCurrentUrl();
 		});
+
+		// Add refresh handler
+		ipcRenderer.on('refresh-tab', () => {
+			this.refreshCurrentTab();
+		});
 	}
 
 	private setupEventListeners() {
@@ -192,20 +197,6 @@ class Browser {
 		this.tabsContainer.appendChild(tabElement);
 		this.webviewContainer.appendChild(webview);
 
-		// Add loading indicator
-		const loadingIndicator = document.createElement('div');
-		loadingIndicator.className = 'loading-indicator';
-		loadingIndicator.textContent = 'Loading...';
-		tabElement.appendChild(loadingIndicator);
-
-		webview.addEventListener('did-start-loading', () => {
-			loadingIndicator.style.display = 'block';
-		});
-
-		webview.addEventListener('did-finish-load', () => {
-			loadingIndicator.style.display = 'none';
-		});
-
 		// Setup webview events
 		webview.addEventListener('did-start-loading', () => {
 			console.log('Webview started loading'); // Debug
@@ -292,11 +283,15 @@ class Browser {
 
 		// Reset the loading bar
 		this.loadingBar.classList.remove('finished');
+		this.loadingBar.classList.remove('loading');
 		this.loadingBar.style.width = '0';
+		this.loadingBar.style.opacity = '0';
 		this.loadingBar.offsetHeight; // Force reflow
 
 		// Start loading animation
-		this.loadingBar.classList.add('loading');
+		requestAnimationFrame(() => {
+			this.loadingBar.classList.add('loading');
+		});
 	}
 
 	private finishLoading() {
@@ -308,8 +303,9 @@ class Browser {
 		this.loadingTimeout = setTimeout(() => {
 			this.loadingBar.classList.remove('finished');
 			this.loadingBar.style.width = '0';
+			this.loadingBar.style.opacity = '0';
 			this.loadingTimeout = null;
-		}, 1000);
+		}, 700); // Reduced cleanup time to match new animation speed
 	}
 
 	private navigateTab(tabId: string, url: string) {
@@ -429,6 +425,16 @@ class Browser {
 
 		const tab = this.tabs.get(this.activeTabId);
 		if (!tab) return;
+	}
+
+	private refreshCurrentTab() {
+		if (this.activeTabId) {
+			const tab = this.tabs.get(this.activeTabId);
+			if (tab) {
+				this.startLoading();
+				tab.webview.reload();
+			}
+		}
 	}
 }
 

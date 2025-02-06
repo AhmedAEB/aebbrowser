@@ -92,6 +92,11 @@ function createWindow() {
 		mainWindow?.webContents.send('copy-current-url');
 	});
 
+	// Add refresh shortcut
+	globalShortcut.register('CommandOrControl+R', () => {
+		mainWindow?.webContents.send('refresh-tab');
+	});
+
 	mainWindow?.on('closed', () => {
 		// Unregister shortcuts when window is closed
 		globalShortcut.unregisterAll();
