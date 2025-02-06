@@ -86,6 +86,12 @@ class Browser {
 			newTabBtn.addEventListener('click', () => this.createNewTab('https://www.google.com'));
 		}
 
+		// Sidebar toggle button
+		const sidebarToggleBtn = document.getElementById('sidebar-toggle');
+		if (sidebarToggleBtn) {
+			sidebarToggleBtn.addEventListener('click', () => this.toggleSidebar());
+		}
+
 		// URL input - handle navigation directly
 		this.urlInput.addEventListener('keypress', (e) => {
 			console.log('Keypress event:', e.key); // Debug

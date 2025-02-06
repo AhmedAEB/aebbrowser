@@ -40,9 +40,11 @@
             bottom: 0;
             transition: left 0.2s;
         }
+
         #sidebar[style*="display: none"] + #right-content {
             left: 0;
         }
+
         #topbar {
             height: 38px;
             background: #F6F3FF;
@@ -249,6 +251,47 @@
             position: relative;
             padding-top: 40px;
             -webkit-app-region: drag;
+            transition: transform 0.2s;
+        }
+
+        #sidebar[style*="display: none"] {
+            transform: translateX(-250px);
+        }
+
+        #sidebar-toggle {
+            position: relative;
+            left: 10px;
+            width: 28px;
+            height: 28px;
+            background: #9F8FD9;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+            box-shadow: 0 2px 4px rgba(167, 139, 250, 0.2);
+            z-index: 10;
+            -webkit-app-region: no-drag;
+            margin-right: 8px;
+        }
+
+        #sidebar-toggle:hover {
+            background: #8875CC;
+            transform: scale(1.05);
+        }
+
+        #sidebar[style*="display: none"] ~ #right-content #sidebar-toggle {
+            transform: rotate(180deg);
+        }
+
+        #sidebar[style*="display: none"] ~ #right-content #sidebar-toggle:hover {
+            transform: rotate(180deg) scale(1.05);
         }
 
         #tabs-container {
@@ -277,6 +320,7 @@
             </div>
             <div id="right-content">
                 <div id="topbar">
+                    <button id="sidebar-toggle">‹</button>
                     <div id="url-container">
                         <input type="text" id="url-input" placeholder="Enter URL or search">
                     </div>
